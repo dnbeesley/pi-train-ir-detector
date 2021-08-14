@@ -5,7 +5,6 @@
 unsigned long start;
 unsigned long t1;
 unsigned long t2;
-int address;
 int toogle;
 int toogleLast;
 int value;
@@ -18,7 +17,6 @@ void setup()
   pinMode(2, INPUT);
   pinMode(5, OUTPUT);
   Wire.begin(0x50);
-  Wire.onReceive(receiveEvent);
   Wire.onRequest(sendData);
 }
 
@@ -56,18 +54,6 @@ void calculateState(int index, uint8_t pin) {
   delayMicroseconds(1000);
 }
 
-void receiveEvent(size_t numBytes) {
-  while(1 < numBytes--) {
-    Wire.read();
-  }
-
-  address = Wire.read();
-}
-
 void sendData() {
-  if (address == 0 || address == 1) {
-    Wire.write(&state[address], 1);
-  } else {
-    Wire.write((uint8_t*)&address, 1);
-  }
+  Wire.write(state, 2);
 }
