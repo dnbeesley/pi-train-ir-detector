@@ -8,21 +8,23 @@ unsigned long t2;
 int toogle;
 int toogleLast;
 int value;
-uint8_t state[2] = { 0xFF, 0xFF };
+uint8_t state[3] = { 0xFF, 0xFF, 0xFF };
 uint8_t workingState;
 
 void setup()
 {
   pinMode(1, INPUT);
   pinMode(2, INPUT);
+  pinMode(3, INPUT);
   pinMode(5, OUTPUT);
-  Wire.begin(0x50);
+  Wire.begin(0x51);
   Wire.onRequest(sendData);
 }
 
 void loop() {
   calculateState(0, A1);
   calculateState(1, A2);
+  calculateState(2, A3);
 }
 
 void calculateState(int index, uint8_t pin) {
@@ -34,16 +36,16 @@ void calculateState(int index, uint8_t pin) {
     t1 = micros();
     t2 = t1 - start;
     toogle = (t2 / DURATION_TOGGLE) % 2;
-    if(toogle == 0 && toogleLast == 1) {
+    if (toogle == 0 && toogleLast == 1) {
       tone(5, 38000);
-    } else if(toogleLast == 0) {
+    } else if (toogleLast == 0) {
       noTone(5);
       digitalWrite(5, LOW);
     }
 
     toogleLast = toogle;
     value = analogRead(pin) / 4;
-    if(value < workingState) {
+    if (value < workingState) {
       workingState = value;
     }
   } while (t2 < DURATION_ON);
@@ -55,5 +57,5 @@ void calculateState(int index, uint8_t pin) {
 }
 
 void sendData() {
-  Wire.write(state, 2);
+  Wire.write(state, 3);
 }
